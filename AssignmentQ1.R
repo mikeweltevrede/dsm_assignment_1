@@ -3,7 +3,7 @@ rm(list = ls())
 PCA_dataprep.function  =  function(path, AIRPOL) {
   library("readxl")
 
-  all_data <- readxl::read_excel(path)
+  all_data <- readxl::read_excel(path, .name_repair = "minimal")
 
   selected_data_00 = all_data[which(all_data[, 2] == AIRPOL):nrow(all_data), ]
 
