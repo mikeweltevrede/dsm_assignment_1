@@ -32,18 +32,46 @@ PCA_dataprep.function <- function(AIRPOL, all_data) {
 
 # PCA plots (Q1 a and b):
 data_sul <- PCA_dataprep.function(AIRPOL = airpol$airpol[5], all_data = airpol$all_data)
-PCA_sul<-prcomp(data_sul)
-load_PC1PC2 <- PCA-sul$rotation[,1:2]
-biplot(PCA, xlabs=rep(".",nrow(PCA_sul$x)), col=c("blue","black"))
+
+#TODO remove
+data_sul = data_sul[, -1:-4]
+
+PCA_sul <- prcomp(data_sul)
+load_PC1PC2 <- PCA_sul$rotation[,1:2]
+biplot(PCA_sul, xlabs=rep(".",nrow(PCA_sul$x)), col = c("blue","black"))
 cum_var_per <- cumsum(PCA_sul$sdev)/sum(PCA_sul$sdev)
 var_per <- PCA_sul$sdev/sum(PCA_sul$sdev)
-plot(var_per, type= 'b', xlab = 'Principal Component', ylab = 'Prop. Variance Explained')
-plot(cum_var_per, type= 'b', xlab = 'Principal Component', ylab = 'Cumulative Prop. Variance Explained')
+plot(var_per, type = 'b', xlab = 'Principal Component', ylab = 'Prop. Variance Explained')
+plot(cum_var_per, type = 'b', xlab = 'Principal Component', ylab = 'Cumulative Prop. Variance Explained')
 
 # BIC Criteria (Q1c)
-Cnp <- min(nrow(data_sul),ncol(data_sul))
+Cnp <- min(nrow(data_sul), ncol(data_sul))
 
-# Recode 28
+# x_ij = alpha_i*f_i + eps_ij
+
+BIC = rep(0, ncol(PCA_sul$rotation))
+SSR = rep(0, ncol(PCA_sul$rotation))
+
+for (k in 1:ncol(PCA_sul$rotation)) {
+  epsilon <- matrix(0, nrow(PCA_sul$x), nrow(PCA_sul$rotation))
+
+  for (i in 1:nrow(PCA_sul$x)) {
+    for (j in 1:nrow(PCA_sul$rotation)) {
+      epsilon[i,j] = data_sul[i,j] - PCA_sul$x[i, k]
+    }
+  }
+
+  print(sum(epsilon))
+
+  SSR[k] = sum(epsilon^2)/(nrow(PCA_sul$x)*nrow(PCA_sul$rotation))
+  BIC[k] = k*log(Cnp)/Cnp + log(SSR[k])
+
+}
+
+plot(BIC, type="l", col="red")
+lines(BIC, col="blue")
+
+# Ex D - Recode 28
 PC1 <- matrix(0,28,length(airpol$airpol))
 PC2 <- matrix(0,28,length(airpol$airpol))
 
@@ -62,11 +90,11 @@ time <- unname(rownames(PCA$x))
 #Principal Component 1 (Q1d)
 data_PC1 <- data.frame(PC1,time)
 data_PC1 <- melt(data_PC1, id.vars='time')
-ggplot(data_PC1, aes(time,value, col=variable)) + 
+ggplot(data_PC1, aes(time,value, col=variable)) +
   geom_point()+geom_smooth(se=F)
 
 #Principal Compent 2 (Q1d)
 data_PC2 <- data.frame(PC2,time)
 data_PC2 <- melt(data_PC2, id.vars='time')
-ggplot(data_PC2, aes(time,value, col=variable)) + 
+ggplot(data_PC2, aes(time,value, col=variable)) +
   geom_point()+geom_smooth(se=F)
