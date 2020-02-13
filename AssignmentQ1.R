@@ -1,6 +1,6 @@
 rm(list = ls())
 
-readdata.function <- function(p) {
+read_data.function <- function(p) {
   library("readxl")
   all_data <- read_excel(p)
   airpol <- all_data[which(all_data[,1] == "AIRPOL"),2]
