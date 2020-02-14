@@ -34,42 +34,34 @@ PCA_dataprep.function <- function(AIRPOL, all_data) {
 data_sul <- PCA_dataprep.function(AIRPOL = airpol$airpol[5], all_data = airpol$all_data)
 
 #TODO remove
-data_sul = data_sul[, -1:-4]
+#data_sul = data_sul[, -1:-4
 
 PCA_sul <- prcomp(data_sul)
 load_PC1PC2 <- PCA_sul$rotation[,1:2]
 biplot(PCA_sul, xlabs=rep(".",nrow(PCA_sul$x)), col = c("blue","black"))
-cum_var_per <- cumsum(PCA_sul$sdev)/sum(PCA_sul$sdev)
+cum_var_per <- cumsum(PCA_sul$sdev^2)/sum(PCA_sul$sdev^2)
 var_per <- PCA_sul$sdev/sum(PCA_sul$sdev)
 plot(var_per, type = 'b', xlab = 'Principal Component', ylab = 'Prop. Variance Explained')
 plot(cum_var_per, type = 'b', xlab = 'Principal Component', ylab = 'Cumulative Prop. Variance Explained')
 
 # BIC Criteria (Q1c)
-Cnp <- min(nrow(data_sul), ncol(data_sul))
+Cnp <- nrow(data_sul)*ncol(data_sul)
+BIC <- rep(0, ncol(PCA_sul$rotation)-1)
+SSR <- rep(0, ncol(PCA_sul$rotation)-1)
+Penalty <- rep(0, ncol(PCA_sul$rotation))
 
-# x_ij = alpha_i*f_i + eps_ij
-
-BIC = rep(0, ncol(PCA_sul$rotation))
-SSR = rep(0, ncol(PCA_sul$rotation))
-
-for (k in 1:ncol(PCA_sul$rotation)) {
-  epsilon <- matrix(0, nrow(PCA_sul$x), nrow(PCA_sul$rotation))
-
+for (k in 1:(ncol(PCA_sul$rotation)-1)) {
+  epsilon2 <- matrix(0, nrow(PCA_sul$x), nrow(PCA_sul$rotation))
   for (i in 1:nrow(PCA_sul$x)) {
     for (j in 1:nrow(PCA_sul$rotation)) {
-      epsilon[i,j] = data_sul[i,j] - PCA_sul$x[i, k]
+      epsilon2[i,j] <- (data_sul[i,j] - PCA_sul$rotation[j,1:k]%*%t(PCA_sul$x)[1:k,i])^2
     }
   }
-
-  print(sum(epsilon))
-
-  SSR[k] = sum(epsilon^2)/(nrow(PCA_sul$x)*nrow(PCA_sul$rotation))
-  BIC[k] = k*log(Cnp)/Cnp + log(SSR[k])
-
+  SSR[k] <- sum(epsilon2)/(nrow(PCA_sul$x)*nrow(PCA_sul$rotation))
+  Penalty[k] <- k*log(Cnp)/Cnp
+  BIC[k] <- Penalty[k] + log(SSR[k])
 }
-
-plot(BIC, type="l", col="red")
-lines(BIC, col="blue")
+plot(BIC)
 
 # Ex D - Recode 28
 PC1 <- matrix(0,28,length(airpol$airpol))
