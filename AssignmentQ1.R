@@ -136,7 +136,7 @@ PC2 <- matrix(0, 28, length(airpol$airpol))
 for (i in 1:length(airpol$airpol)) {
   data <- PCA_dataprep.function(AIRPOL = airpol$airpol[i],
                                 all_data = airpol$all_data)
-  PCA <- prcomp(data)
+  PCA <- prcomp(data$scaled_data)
   PC1[, i] <- PCA$x[, 1]
   PC2[, i] <- PCA$x[, 2]
 }
