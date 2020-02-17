@@ -39,7 +39,7 @@ data_sul <- PCA_dataprep.function(airpol$airpol[5], airpol$all_data)
 
 # PCA plots (Q1 - a and b):
 PCA_sul <- prcomp(data_sul$scaled_data)
-load_PC1PC2 <- PCA_sul$rotation[,1:2]
+load_PC1PC2 <- PCA_sul$rotation[, 1:2]
 
 biplot(PCA_sul, xlabs = rep(".", nrow(PCA_sul$x)), col = c("blue", "black"))
 
@@ -155,7 +155,8 @@ colnames(data_PC1)[2] <- 'pollutant'
 ggplot(data_PC1, aes(years, pollution, col = pollutant)) +
   geom_point() + geom_line() + ylab('1st principal component') +
   ggtitle("1st principal component per pollutant over the years" ) +
-  theme_bw()
+  theme_bw() + theme(legend.position = c(0.86, 0.15),
+                     legend.background = element_blank())
 
 #Principal Compent 2 (Q1d)
 rownames(PC2) <- rownames(PCA$x)
@@ -165,7 +166,9 @@ data_PC2 <- melt(data_PC2, id.vars = 'years')
 data_PC2$time <- as.numeric(as.character(data_PC2$years))
 colnames(data_PC2)[3] <- 'pollution'
 colnames(data_PC2)[2] <- 'pollutant'
+
 ggplot(data_PC2, aes(time, pollution, col = pollutant)) +
  geom_line() + geom_point() + ylab('2nd principal component') +
   ggtitle("2nd principal component per pollutant over the years" ) +
-  theme_bw()
+  theme_bw() + theme(legend.position = c(0.86, 0.15),
+                     legend.background = element_blank())
