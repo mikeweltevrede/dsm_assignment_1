@@ -96,7 +96,7 @@ title(main = 'Number of PC Selection', xlab = 'Number of PC', ylab = 'BIC')
 legend("bottomleft", c("log(SSR)", "Penalty", "BIC"), cex = 0.8,
        col = c("red", "green", "blue"), lty = 1:2)
 
-# BIC Criteria (Q1c) - trial unscaled data
+# BIC Criteria (Q1c) - unscaled data
 PCA_sul <- prcomp(data_sul$selected_data_02)
 
 if (nrow(data_sul$selected_data_02) == ncol(data_sul$selected_data_02)) {
